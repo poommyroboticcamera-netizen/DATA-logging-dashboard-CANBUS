@@ -9,6 +9,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include "Analysis.h"
+#include "CsvEncoder.h"
 
 #include "CanService.h"
 #include "ConsoleLine.h"
@@ -324,12 +325,9 @@ static void loggerTask(void *) {
     xSemaphoreTake(logGate,portMAX_DELAY); logEnabled = false; xSemaphoreGive(logGate);
   };
   auto writeFrame = [&](const Frame &f) {
-    char row[180]; int n = snprintf(row,sizeof(row),"%llu,%08lX,%u,%u",
-      (unsigned long long)f.us,(unsigned long)f.id,f.extended,f.dlc);
-    for (unsigned i = 0; i < 8; ++i)
-      n += snprintf(row+n,sizeof(row)-n,(!f.rtr && i < f.dlc) ? ",%u" : ",",f.data[i]);
-    row[n++] = '\n';
-    if (buffered + unsigned(n) > sizeof(buffer) && !writeBuffer()) return false;
+    char row[180]; const size_t n = encodeCsvRow(row,sizeof(row),f);
+    if (!n) { ++logErrors; return false; }
+    if (buffered + n > sizeof(buffer) && !writeBuffer()) return false;
     memcpy(buffer+buffered,row,n); buffered += n; ++bufferedRows; ++logWritten;
     if (f.rtr && meta.printf("RTR,%llu,%08lX,%u,%u\n",(unsigned long long)f.us,
         (unsigned long)f.id,f.extended,f.dlc) == 0) { ++logErrors; return false; }
