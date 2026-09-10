@@ -32,6 +32,9 @@ jobs:
       - name: Verify offline CAN analysis fixtures
         run: python tests/can/test_offline_analyzer.py
 
+      - name: Verify bench CSV integrity checker
+        run: python tests/can/test_verify_bench_csv.py
+
       - name: Verify dashboard logic
         run: node dashboard/can.test.cjs
 

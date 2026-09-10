@@ -232,7 +232,14 @@ errors ของ driver poll ทุก 100 ms; ช่วงก่อนปิด
 2. ตัวส่งใช้ `examples/can_bench_generator/can_bench_generator.ino`: TX25, RX26, 500 kbit/s
 3. ในวงจร bench ที่แยกจากรถ ต่อ GPIO27 ของตัวส่งลง GND และส่ง `ENABLE BENCH`
 4. เปิด CAN บนตัวรับ ควรพบ synthetic IDs 0x321 (ทั้ง STD และ EXT), 0x322, 0x345 และ RTR 0x456
-5. ตัวส่ง `ACTION ON` เพิ่มการเปลี่ยนค่าและ ID 0x700; ใช้ baseline/action เปรียบเทียบ
+5. กด `LOG START` ที่ตัวรับ รออย่างน้อย 10 วินาที แล้วกด `LOG STOP` และรอจนสถานะเป็น `STOPPED`
+6. นำ SD มาเปิดบนคอมพิวเตอร์ แล้วตรวจไฟล์ที่ได้ด้วย:
+
+```sh
+python scripts/verify_bench_csv.py can_000001.csv
+```
+
+ผล `PASS` ยืนยันว่า CSV ทุกแถวมีโครงสร้างถูกต้อง, timestamp ไม่ย้อนกลับ และพบ stream จำลอง 0x321 ทั้ง STD/EXT, 0x322, 0x345 และ RTR 0x456 อย่างน้อยหนึ่งเฟรม หากขึ้น `FAIL` ห้ามถือว่าการทดสอบ logger ผ่าน
 
 ตัวส่ง bench ใช้ No-ACK เพราะตัวรับ passive ไม่ส่ง ACK
 ไฟล์ encoder `Documents/Arduino/can/can.ino` ของคุณใช้ Normal mode และคาดหวัง ACK
