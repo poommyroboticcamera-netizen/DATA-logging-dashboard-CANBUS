@@ -164,12 +164,16 @@ static void rxTask(void *) {
       portEXIT_CRITICAL(&telemetryMux);
       if (m.data_length_code > 8 || m.dlc_non_comp ||
           m.identifier > (m.extd ? 0x1FFFFFFFu : 0x7FFu)) ++invalidFrames;
-      else if (acquiring.load()) {
+      else {
         Frame f = {}; f.us = workStart; f.id = m.identifier;
         f.extended = m.extd; f.rtr = m.rtr; f.dlc = m.data_length_code; f.gap = epoch.load();
         if (!f.rtr) memcpy(f.data, m.data, f.dlc);
-        if (xQueueSend(frameQueue, &f, 0) != pdTRUE) { ++analysisDrops; ++epoch; }
-        highWater(rxHighWater, frameQueue);
+        if (acquiring.load()) {
+          if (xQueueSend(frameQueue, &f, 0) != pdTRUE) { ++analysisDrops; ++epoch; }
+          highWater(rxHighWater, frameQueue);
+        }
+        // The raw logger is independent of the bounded analysis database and
+        // receives every valid frame while LOG START is active.
         if (logEnabled.load()) {
           if (xSemaphoreTake(logGate, 0) == pdTRUE) {
             if (logEnabled.load()) {

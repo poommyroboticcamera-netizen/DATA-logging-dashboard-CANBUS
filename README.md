@@ -24,7 +24,7 @@
 
 โปรเจกต์ PlatformIO สำหรับสำรวจและบันทึก Classical CAN ด้วย ESP32 และ CAN transceiver ภายนอก โดยออกแบบหน้าตาและ workflow จาก `DATA-Logging-Dashboard-esp32` แต่เป็น CAN-only และไม่มีโมดูลเซนเซอร์เสริม
 
-เปิดหน้าเว็บผ่าน Wi-Fi เพื่อดู traffic, เลือก bitrate, วิเคราะห์ ID และเปรียบเทียบ baseline กับการทดลอง ระบบรายงานเป็น candidate เพื่อช่วยคนวิเคราะห์ โดยไม่สมมติยี่ห้อรถ, DBC หรือความหมายของ signal
+เปิดหน้าเว็บผ่าน Wi-Fi เพื่อดู traffic ทุก ID, เลือก bitrate, ตรวจ dropped frames และสั่งเริ่ม/หยุดบันทึก CSV ลง SD โดยไม่สมมติยี่ห้อรถ, DBC หรือความหมายของ signal
 
 หน้าเว็บถูกฝังใน firmware และใช้งานกับ ESP32 ในเครือข่ายท้องถิ่น นอกจากนี้ repository มี [Web Demo สำหรับ ESP32](https://poommyroboticcamera-netizen.github.io/DATA-logging-dashboard-CANBUS/) ที่ใช้ข้อมูลจำลองเพื่อดูเกจ, กราฟ raw candidate, บันทึกทุก ID ใน session และดาวน์โหลด CSV ได้โดยไม่ต้องต่อฮาร์ดแวร์
 
@@ -37,7 +37,7 @@
 | Bitrate | Runtime selection while CAN is off | 500 kbit/s |
 | Analysis | Byte/bit statistics and signal candidates | 16 traffic records |
 | History | Bounded samples per record | 32 recent frames |
-| Experiments | Baseline versus labelled action | 10 seconds |
+| Operation | Bitrate + CAN on/off + CSV start/stop | Operator controlled |
 | Recording | Independent queue → SD task → CSV | Started by operator |
 | Interface | Embedded web dashboard and Serial | Wi-Fi / 115200 baud |
 

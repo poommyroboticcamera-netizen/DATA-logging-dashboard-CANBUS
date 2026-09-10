@@ -16,7 +16,6 @@ void startWebServer() {
   const char *headers[] = {"X-Dashboard-Request"}; server.collectHeaders(headers, 1);
   server.on("/", HTTP_GET, [] { server.sendHeader("Content-Encoding", "gzip"); server.send_P(200, "text/html; charset=utf-8", reinterpret_cast<const char *>(DASHBOARD_GZIP), sizeof(DASHBOARD_GZIP)); });
   server.on("/api/can", HTTP_GET, [] { if (!canservice::statusJson(responseBuffer, sizeof(responseBuffer))) server.send(503,"text/plain","CAN snapshot busy/unavailable"); else server.send(200,"application/json",responseBuffer); });
-  server.on("/api/can/report", HTTP_GET, [] { if (!canservice::reportText(responseBuffer, sizeof(responseBuffer))) server.send(503,"text/plain","Report busy"); else server.send(200,"text/plain; charset=utf-8",responseBuffer); });
   server.on("/api/can/mode", HTTP_POST, [] {
     if (!dashboardRequest() || !server.hasArg("mode")) { server.send(400,"text/plain","Bad request"); return; }
     String mode=server.arg("mode"); if(mode!="can"&&mode!="dashboard"){server.send(400,"text/plain","Invalid mode");return;}

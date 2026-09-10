@@ -55,6 +55,9 @@
     intervalCard.querySelector('.form-row').innerHTML = '<div class="all-frame-policy">EVERY FRAME · NO SAMPLING</div>';
     intervalCard.querySelector('.hint').textContent = 'ไม่จำกัดเฉพาะ ID ที่มีช่องวิเคราะห์ · database เต็มก็ยังส่งเข้า logger';
   }
+  const guidedCard = [...document.querySelectorAll('.control')]
+    .find(card => card.querySelector('h3')?.textContent === 'Guided learning');
+  if (guidedCard) guidedCard.remove();
 
   const history = { fps: [], raw: [] };
   let previousFrames = 0;
