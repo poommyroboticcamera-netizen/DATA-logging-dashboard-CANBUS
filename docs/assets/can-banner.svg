@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
+<title id="title">ESP32 Passive CAN Analyzer</title><desc id="desc">Project cover: discover traffic, inspect candidates and record raw CAN data. This is an illustration, not a hardware capture.</desc>
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#071019"/><stop offset="1" stop-color="#15354c"/></linearGradient></defs>
+<rect width="1280" height="420" rx="20" fill="url(#bg)"/>
+<g fill="none" stroke="#24475c" opacity=".55"><path d="M720 0v420M800 0v420M880 0v420M960 0v420M1040 0v420M1120 0v420M1200 0v420M680 80h600M680 160h600M680 240h600M680 320h600"/></g>
+<rect x="54" y="58" width="6" height="280" fill="#25d5ce"/>
+<g font-family="Segoe UI,Arial,sans-serif"><text x="84" y="89" fill="#25d5ce" font-size="17" letter-spacing="4">ESP32 / TWAI / FREERTOS</text>
+<text x="80" y="164" fill="#f0f6fc" font-size="55" font-weight="700">PASSIVE CAN</text><text x="80" y="222" fill="#f0f6fc" font-size="49" font-weight="700">ANALYZER</text>
+<text x="84" y="273" fill="#a9bdce" font-size="21">Discover traffic. Inspect candidates. Record raw data.</text>
+<rect x="84" y="307" width="146" height="33" rx="16" fill="#124947"/><text x="102" y="330" fill="#a6fff1" font-size="15">LISTEN ONLY</text>
+<text x="252" y="330" fill="#a9bdce" font-size="16">11-bit + 29-bit IDs · SD CSV · Web dashboard</text>
+<rect x="830" y="85" width="368" height="235" rx="14" fill="#0b1926" stroke="#36546b"/>
+<text x="854" y="119" fill="#91a3b7" font-size="14" letter-spacing="2">OBSERVE → ANALYZE → LOG</text>
+<path d="M856 186h28v-33h42v33h38v-33h34v33h42v-33h45v33h35v-33h40v33h14" fill="none" stroke="#25d5ce" stroke-width="3"/>
+<text x="854" y="232" fill="#e8f0f7" font-size="18">All IDs · Bounded statistics</text><text x="854" y="264" fill="#91a3b7" font-size="16">No assumed DBC or signal meaning</text>
+<text x="854" y="296" fill="#647e94" font-size="12">PROJECT ILLUSTRATION / NOT LIVE DATA</text></g></svg>
