@@ -26,7 +26,7 @@
 
 เปิดหน้าเว็บผ่าน Wi-Fi เพื่อดู traffic, เลือก bitrate, วิเคราะห์ ID และเปรียบเทียบ baseline กับการทดลอง ระบบรายงานเป็น candidate เพื่อช่วยคนวิเคราะห์ โดยไม่สมมติยี่ห้อรถ, DBC หรือความหมายของ signal
 
-หน้าเว็บถูกฝังใน firmware และใช้งานกับ ESP32 ในเครือข่ายท้องถิ่น นอกจากนี้ยังมี [Web Demo สำหรับ ESP32](https://poommyroboticcamera-netizen.github.io/DATA-logging-dashboard-CANBUS/) ที่ใช้ข้อมูลจำลองเพื่อดู layout และ workflow ได้โดยไม่ต้องต่อฮาร์ดแวร์
+หน้าเว็บถูกฝังใน firmware และใช้งานกับ ESP32 ในเครือข่ายท้องถิ่น นอกจากนี้ repository มี [Web Demo สำหรับ ESP32](https://poommyroboticcamera-netizen.github.io/DATA-logging-dashboard-CANBUS/) ที่ใช้ข้อมูลจำลองเพื่อดู layout และ workflow ได้โดยไม่ต้องต่อฮาร์ดแวร์ โดยต้องเปิดใช้ GitHub Pages ของ repository ก่อน
 
 ## Project at a glance
 
