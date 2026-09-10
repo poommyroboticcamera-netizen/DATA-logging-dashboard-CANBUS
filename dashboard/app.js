@@ -1,0 +1,1 @@
+/* CAN workspace behavior is implemented in can.js. */
