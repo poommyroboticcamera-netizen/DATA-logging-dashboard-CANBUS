@@ -317,8 +317,11 @@ static void loggerTask(void *) {
   static char buffer[4096];
   auto writeBuffer = [&]() {
     if (!buffered) return true;
+    const unsigned rows = bufferedRows;
     bool ok = csv.write(reinterpret_cast<const uint8_t *>(buffer),buffered) == buffered;
-    buffered = 0; if (!ok) { ++logErrors; logDiscarded.fetch_add(bufferedRows); }
+    buffered = 0;
+    if (ok) logWritten.fetch_add(rows);
+    else { ++logErrors; logDiscarded.fetch_add(rows); }
     bufferedRows = 0; return ok;
   };
   auto disable = [&]() {
@@ -328,9 +331,7 @@ static void loggerTask(void *) {
     char row[180]; const size_t n = encodeCsvRow(row,sizeof(row),f);
     if (!n) { ++logErrors; return false; }
     if (buffered + n > sizeof(buffer) && !writeBuffer()) return false;
-    memcpy(buffer+buffered,row,n); buffered += n; ++bufferedRows; ++logWritten;
-    if (f.rtr && meta.printf("RTR,%llu,%08lX,%u,%u\n",(unsigned long long)f.us,
-        (unsigned long)f.id,f.extended,f.dlc) == 0) { ++logErrors; return false; }
+    memcpy(buffer+buffered,row,n); buffered += n; ++bufferedRows;
     return true;
   };
   for (;;) {
@@ -350,7 +351,7 @@ static void loggerTask(void *) {
         if (!csv || !meta || !csv.println("timestamp_us,id,extended,dlc,d0,d1,d2,d3,d4,d5,d6,d7")) {
           ++logErrors; csv.close(); meta.close(); notice("SD open/header failed.");logState="OPEN_FAILED";xSemaphoreGive(storageMutex);continue;
         }
-        if (!meta.printf("LISTEN_ONLY,bitrate=%lu,timestamp=task_dequeue_us\nSTART,rx=%lu,analysis_drop=%lu,log_drop=%lu\n",
+        if (!meta.printf("LISTEN_ONLY,bitrate=%lu,timestamp=rx_dequeue_us\nSTART,rx=%lu,analysis_drop=%lu,log_drop=%lu\n",
           (unsigned long)configuredBitrate.load(),(unsigned long)rxFrames.load(),(unsigned long)analysisDrops.load(),(unsigned long)logDrops.load())) {
           ++logErrors; csv.close(); meta.close(); notice("SD metadata write failed.");logState="WRITE_FAILED";xSemaphoreGive(storageMutex);continue;
         }
@@ -360,14 +361,18 @@ static void loggerTask(void *) {
         char message[96]; snprintf(message,sizeof(message),"Logging to %s; .meta contains RTR and loss information.",path); notice(message);
       } else if (command == 'T' && open) {
         logState="CLOSING";disable();
-        Frame f; while (xQueueReceive(logQueue,&f,0) == pdTRUE)
-          if (!writeFrame(f)) ++logDiscarded;
-        writeBuffer();
+        bool stopOk = true;
+        Frame f; while (xQueueReceive(logQueue,&f,0) == pdTRUE) {
+          if (!writeFrame(f)) { ++logDiscarded; stopOk = false; }
+        }
+        if (!writeBuffer()) stopOk = false;
         if (!meta.printf("STOP,analysis_drop=%lu,log_drop=%lu,driver_missed=%lu,driver_overrun=%lu,write_errors=%lu\n",
           (unsigned long)analysisDrops.load(),(unsigned long)logDrops.load(),(unsigned long)driverMissed.load(),
-          (unsigned long)driverOverruns.load(),(unsigned long)logErrors.load())) ++logErrors;
+          (unsigned long)driverOverruns.load(),(unsigned long)logErrors.load())) { ++logErrors; stopOk = false; }
         csv.flush(); meta.flush(); csv.close(); meta.close(); open = false; xSemaphoreGive(storageMutex);
-        logState="STOPPED";notice("Logging stopped; queues drained and files closed. Check STATUS for errors.");
+        logState=stopOk ? "STOPPED" : "STOPPED_WITH_ERRORS";
+        notice(stopOk ? "Logging stopped; queued CSV rows were written and files closed."
+                      : "Logging stopped with SD write errors; check loss counters before using the file.");
       } else notice(open ? "Logging is already active." : "Logging is already stopped.");
     }
     Frame f;

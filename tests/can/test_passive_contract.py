@@ -67,6 +67,20 @@ class PassiveContractTest(unittest.TestCase):
         self.assertNotIn('id="can-baseline"', DASHBOARD_HTML)
         self.assertNotIn('id="can-experiment"', DASHBOARD_HTML)
 
+    def test_sd_row_count_and_close_status_reflect_confirmed_writes(self):
+        logger = CAN_SOURCE[CAN_SOURCE.index("static void loggerTask"):CAN_SOURCE.index("static bool copyRecord")]
+        write_buffer = logger[logger.index("auto writeBuffer"):logger.index("auto disable")]
+        write_frame = logger[logger.index("auto writeFrame"):logger.index("for (;;)" )]
+        self.assertIn("if (ok) logWritten.fetch_add(rows)", write_buffer)
+        self.assertNotIn("++logWritten", write_frame)
+        self.assertIn('logState=stopOk ? "STOPPED" : "STOPPED_WITH_ERRORS"', logger)
+        self.assertIn("if (!writeBuffer()) stopOk = false", logger)
+
+    def test_dashboard_contains_no_graph_or_guided_learning_controls(self):
+        lowered = DASHBOARD_HTML.lower()
+        for removed in ("<canvas", "gauge", "trend", "guided", "baseline", "experiment"):
+            self.assertNotIn(removed, lowered)
+
 
 if __name__ == "__main__":
     unittest.main()
