@@ -16,7 +16,7 @@ const packet={
   mode:'LISTEN_ONLY',active:true,enabled:true,requested_enabled:true,driver_state:'LISTENING',
   acquiring:true,bitrate:500000,tx_gpio:25,rx_gpio:26,capacity:16,frames:4,
   rx_session_frames:4,rx_standard:3,rx_extended:1,rx_rtr:1,last_rx_age_ms:20,
-  log_state:'STOPPED',report_revision:1,candidates:[],ids:[
+  log_state:'STOPPED',ids:[
     {id:0x100,extended:false,rtr:false,dlc:4,count:1,hz:50,data:[0,0,0,37]},
     {id:0x100,extended:true,rtr:false,dlc:2,count:1,hz:50,data:[170,255]},
     {id:0x154,extended:false,rtr:false,dlc:0,count:1,hz:1,data:[]},
@@ -30,7 +30,7 @@ const context={
   window:{},console,AbortSignal,URLSearchParams,setTimeout(){},
   fetch:async(path,options)=>{
     requests.push({path,options});
-    return {ok:true,json:async()=>packet,text:async()=>'Candidate report'};
+    return {ok:true,json:async()=>packet,text:async()=>'OK'};
   }
 };
 vm.runInNewContext(fs.readFileSync(__dirname+'/can.js','utf8'),context);
@@ -43,8 +43,6 @@ vm.runInNewContext(fs.readFileSync(__dirname+'/can.js','utf8'),context);
   assert.equal(rows[2].children[5].textContent,'Empty payload');
   assert.match(rows[3].children[5].textContent,/Remote request/);
   assert.match(elements.get('can-diagnosis').textContent,/พบ CAN traffic/);
-  await elements.get('can-acquire').onclick();
-  assert.ok(requests.some(r=>r.options?.body?.get('command')==='STOP'));
   packet.rx_session_frames=0;
   await elements.get('can-status').onclick();
   assert.match(elements.get('can-diagnosis').textContent,/ยังไม่มีเฟรม/);

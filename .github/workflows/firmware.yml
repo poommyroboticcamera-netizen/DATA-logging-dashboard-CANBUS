@@ -44,5 +44,8 @@ jobs:
       - name: Run CSV encoder test
         run: ./test_csv_encoder
 
+      - name: Prepare CI Wi-Fi configuration
+        run: cp include/wifi_config.example.h include/wifi_config.h
+
       - name: Build ESP32 firmware
         run: pio run -e esp32dev

@@ -27,7 +27,7 @@
 
 เปิดหน้าเว็บผ่าน Wi-Fi เพื่อดู traffic ทุก ID, เลือก bitrate, ตรวจ dropped frames และสั่งเริ่ม/หยุดบันทึก CSV ลง SD โดยไม่สมมติยี่ห้อรถ, DBC หรือความหมายของ signal
 
-หน้าเว็บถูกฝังใน firmware และใช้งานกับ ESP32 ในเครือข่ายท้องถิ่น นอกจากนี้ repository มี [Web Demo สำหรับ ESP32](https://poommyroboticcamera-netizen.github.io/DATA-logging-dashboard-CANBUS/) ที่ใช้ข้อมูลจำลองเพื่อดูเกจ, กราฟ raw candidate, บันทึกทุก ID ใน session และดาวน์โหลด CSV ได้โดยไม่ต้องต่อฮาร์ดแวร์
+หน้าเว็บถูกฝังใน firmware และใช้งานกับ ESP32 ในเครือข่ายท้องถิ่น นอกจากนี้ repository มี [Web Demo สำหรับ ESP32](https://poommyroboticcamera-netizen.github.io/DATA-logging-dashboard-CANBUS/) สำหรับทดลองตั้ง bitrate, เปิด/ปิด CAN, เริ่ม/หยุดบันทึกทุก ID และดาวน์โหลด CSV โดยไม่ต้องต่อฮาร์ดแวร์
 
 ## Project at a glance
 
