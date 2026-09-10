@@ -11,6 +11,7 @@
 ![PlatformIO](https://img.shields.io/badge/build-PlatformIO-0B1220?style=for-the-badge&logo=platformio&logoColor=F59E0B)
 ![FreeRTOS](https://img.shields.io/badge/runtime-FreeRTOS-0B1220?style=for-the-badge)
 ![Listen only](https://img.shields.io/badge/CAN-LISTEN_ONLY-0D6661?style=for-the-badge)
+[![Validate ESP32 CAN logger](https://github.com/poommyroboticcamera-netizen/DATA-logging-dashboard-CANBUS/actions/workflows/firmware.yml/badge.svg)](https://github.com/poommyroboticcamera-netizen/DATA-logging-dashboard-CANBUS/actions/workflows/firmware.yml)
 
 [Overview](#overview) · [Features](#features) · [Getting started](#getting-started) · [Hardware map](#hardware-map) · [Data logging](#data-logging) · [Web demo](https://poommyroboticcamera-netizen.github.io/DATA-logging-dashboard-CANBUS/) · [Validation](VALIDATION.md)
 
