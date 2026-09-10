@@ -30,6 +30,8 @@ if(typeof document!=='undefined')(() => {
   'use strict';
   const $=id=>document.getElementById(id), C=CanDashboardCore;
   let mode='dashboard', changing=false, busy=false, closing=false, lastSuccess=0, lastPacket=null;
+  let previousFrames=0, previousSampleAt=Date.now(), recordingStartedAt=0;
+  const trendRate=[], trendRaw=[];
   window.DashboardModes={current:()=>mode,interval:()=>mode==='dashboard'?250:1000};
   function note(text,error=false) { $('mode-status').textContent=text;$('mode-status').classList.toggle('mode-error',error); }
   function showMode(next) {
@@ -61,6 +63,32 @@ if(typeof document!=='undefined')(() => {
     catch(error){note(error.message,true);}
   }
   function cell(row,text) {const td=document.createElement('td');td.textContent=text;row.append(td);return td;}
+  function gauge(id,value,max) {
+    const element=$(id);if(element?.style?.setProperty)element.style.setProperty('--level',String(Math.max(0,Math.min(100,max?value/max*100:0))));
+  }
+  function drawTrend() {
+    const canvas=$('can-trend');if(!canvas || typeof canvas.getContext!=='function')return;
+    const ratio=window.devicePixelRatio||1,width=Math.max(320,canvas.clientWidth),height=180;
+    if(canvas.width!==Math.round(width*ratio)||canvas.height!==Math.round(height*ratio)){canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);}
+    const ctx=canvas.getContext('2d');ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,width,height);
+    const plot=(values,max,color)=>{if(values.length<2)return;ctx.beginPath();values.forEach((value,index)=>{const x=index/59*width,y=height-10-Math.min(1,value/max)*(height-20);index?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();};
+    plot(trendRate,1000,'#5d9ff5');plot(trendRaw,255,'#b184ea');
+  }
+  function renderReadings(p) {
+    const now=Date.now(),seconds=Math.max(.001,(now-previousSampleAt)/1000),rate=Math.max(0,(Number(p.frames)-previousFrames)/seconds);
+    previousFrames=Number(p.frames);previousSampleAt=now;
+    const load=Math.min(100,(p.ids||[]).reduce((sum,item)=>sum+Number(item.hz||0)*((item.extended?67:47)+(item.rtr?0:8*Number(item.dlc||0))),0)/Math.max(1,Number(p.bitrate))*100);
+    const busiest=[...(p.ids||[])].sort((a,b)=>Number(b.count)-Number(a.count))[0];
+    const raw=busiest&&!busiest.rtr&&busiest.data?.length?Number(busiest.data[0]):0;
+    $('can-rate').textContent=rate.toFixed(1);$('can-load').textContent=load.toFixed(1);$('can-active-ids').textContent=p.ids.length;$('can-id-scale').textContent=p.capacity;$('can-raw').textContent=raw;
+    $('can-raw-source').textContent=busiest?`${C.hex(busiest.id)} · byte 0 · candidate เท่านั้น`:'ยังไม่มี candidate';
+    gauge('can-gauge-rate',rate,1000);gauge('can-gauge-load',load,100);gauge('can-gauge-ids',p.ids.length,p.capacity);gauge('can-gauge-raw',raw,255);
+    trendRate.push(rate);trendRaw.push(raw);if(trendRate.length>60)trendRate.shift();if(trendRaw.length>60)trendRaw.shift();drawTrend();
+    const active=p.log_state==='RECORDING';if(active&&!recordingStartedAt)recordingStartedAt=now;if(!active)recordingStartedAt=0;
+    $('can-recording-rows').textContent=Number(p.rows).toLocaleString();$('can-recording-badge').textContent=active?'กำลังเก็บ':'พร้อม';$('can-recording-badge').className='pill '+(active?'on':'');document.querySelector('.recording-card')?.classList.toggle('active',active);
+    const elapsed=recordingStartedAt?Math.floor((now-recordingStartedAt)/1000):0,h=String(Math.floor(elapsed/3600)).padStart(2,'0'),m=String(Math.floor(elapsed%3600/60)).padStart(2,'0'),s=String(elapsed%60).padStart(2,'0');
+    $('can-recording-time').textContent=active?`เวลาที่บันทึก ${h}:${m}:${s} · ทุก valid frame`:p.file?`ไฟล์ล่าสุด ${p.file}`:'CSV logger หยุดอยู่';
+  }
   function renderCan(p) {
     if(p.demo){closing=false;note('ตัวอย่างหน้าเว็บเท่านั้น · ไม่มีเฟรม CAN หรือไฟล์ SD จริง');}
     $('can-log-state').textContent=C.states[p.log_state]||p.log_state;
@@ -89,6 +117,7 @@ if(typeof document!=='undefined')(() => {
     $('can-id-count').textContent=`${p.ids.length} / ${p.capacity}`;
     $('can-drops').textContent=`RX ${p.driver_missed+p.driver_overruns} · วิเคราะห์ ${p.analysis_drops} · CSV ${p.log_drops}`;
     $('can-memory').textContent=p.demo?'ไม่วัด RAM ในหน้า demo':`ว่าง ${Math.round(p.free_heap/1024)} KiB · ต่ำสุด ${Math.round(p.min_heap/1024)} KiB`;
+    renderReadings(p);
     $('can-wiring').textContent=`${p.bitrate/1000} kbit/s · TX GPIO${p.tx_gpio} / RX GPIO${p.rx_gpio} · ตรวจสายก่อนต่อรถ`;
     $('can-rows').textContent=`รับเข้า buffer/เขียนแล้ว ${Number(p.rows).toLocaleString()} แถว · write errors ${p.write_errors} · database-full frames ${p.db_full}`;
     const tbody=$('can-ids');tbody.replaceChildren();
