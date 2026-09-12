@@ -22,6 +22,9 @@ def verify(path: Path) -> tuple[int, Counter[tuple[int, int]], list[str]]:
             return 0, counts, [f"wrong header: {reader.fieldnames!r}"]
         for line, row in enumerate(reader, 2):
             rows += 1
+            if None in row or any(value is None for value in row.values()):
+                errors.append(f"line {line}: wrong number of columns")
+                continue
             try:
                 timestamp = int(row["timestamp_us"])
                 can_id = int(row["id"], 16)
@@ -30,6 +33,8 @@ def verify(path: Path) -> tuple[int, Counter[tuple[int, int]], list[str]]:
             except (TypeError, ValueError) as exc:
                 errors.append(f"line {line}: invalid timestamp/ID/extended/DLC ({exc})")
                 continue
+            if timestamp < 0:
+                errors.append(f"line {line}: negative timestamp")
             if timestamp < previous_timestamp:
                 errors.append(f"line {line}: timestamp moved backwards")
             previous_timestamp = timestamp
@@ -50,8 +55,12 @@ def verify(path: Path) -> tuple[int, Counter[tuple[int, int]], list[str]]:
                     errors.append(f"line {line}: payload does not match DLC")
                 if any(payload[i] == "" for i in range(dlc)) or any(payload[i] != "" for i in range(dlc, 8)):
                     errors.append(f"line {line}: payload columns are not contiguous")
-            elif dlc == 0:
-                pass  # Valid zero-length DATA frame; CSV has no explicit RTR column.
+            # The bench generator emits RTR only on STD 0x456, DLC 8.
+            if (can_id, extended) == (0x456, 0):
+                if populated or dlc != 8:
+                    errors.append(f"line {line}: expected bench RTR with DLC 8 and no payload")
+            elif dlc and not populated:
+                errors.append(f"line {line}: missing DATA payload in bench capture")
             counts[(can_id, extended)] += 1
     missing = sorted(EXPECTED - counts.keys())
     if missing:
@@ -75,6 +84,7 @@ def main() -> int:
             print("FAIL:", error)
         return 1
     print(f"PASS: {rows} well-formed rows; every expected bench ID/type was captured")
+    print("Presence and format checks only; this does not prove zero lost frames.")
     return 0
 
 

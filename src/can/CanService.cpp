@@ -375,8 +375,11 @@ static void loggerTask(void *) {
                       : "Logging stopped with SD write errors; check loss counters before using the file.");
       } else notice(open ? "Logging is already active." : "Logging is already stopped.");
     }
+    // Drain a bounded batch per tick; a delay per frame caps throughput at
+    // the RTOS tick rate even when the SD card could keep up.
     Frame f;
-    if (xQueueReceive(logQueue,&f,pdMS_TO_TICKS(20)) == pdTRUE) {
+    for (unsigned batch=0; batch<32; ++batch) {
+      if (xQueueReceive(logQueue,&f,batch ? 0 : pdMS_TO_TICKS(20)) != pdTRUE) break;
       if (!open) ++logDiscarded;
       else if (!writeFrame(f)) {
         // Conservatively count all unconfirmed rows after a write/metadata error.
