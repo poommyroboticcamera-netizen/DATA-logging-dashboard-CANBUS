@@ -1,3 +1,7 @@
+**Language:** English · [ไทย](README_TH.md)
+
+The dashboard and its GitHub Pages demo start in English. Select **ไทย** in the header to switch to Thai; the browser remembers your choice.
+
 <div align="center">
 
 <img src="docs/assets/can-banner.svg" alt="ESP32 Passive CAN Analyzer — discover traffic, inspect candidates, record raw data" width="100%">
@@ -15,7 +19,7 @@
 
 [Overview](#overview) · [Features](#features) · [Getting started](#getting-started) · [Hardware map](#hardware-map) · [Data logging](#data-logging) · [Web demo](https://poommyroboticcamera-netizen.github.io/DATA-logging-dashboard-CANBUS/) · [Validation](VALIDATION.md)
 
-<sub>ภาพปกเป็นภาพประกอบโปรเจกต์ ไม่ใช่ผลการรับ CAN จากฮาร์ดแวร์</sub>
+<sub>The cover image is an illustration of the project. It is not the result of receiving CAN from the hardware.</sub>
 
 </div>
 
@@ -23,11 +27,11 @@
 
 ## Overview
 
-โปรเจกต์ PlatformIO สำหรับสำรวจและบันทึก Classical CAN ด้วย ESP32 และ CAN transceiver ภายนอก โดยออกแบบหน้าตาและ workflow จาก `DATA-Logging-Dashboard-esp32` แต่เป็น CAN-only และไม่มีโมดูลเซนเซอร์เสริม
+PlatformIO project for exploring and recording Classical CAN with ESP32 and external CAN transceiver, with design and workflow from `DATA-Logging-Dashboard-esp32` But it's CAN-only and doesn't have an optional sensor module.
 
-เปิดหน้าเว็บผ่าน Wi-Fi เพื่อดู traffic ทุก ID, เลือก bitrate, ตรวจ dropped frames และสั่งเริ่ม/หยุดบันทึก CSV ลง SD โดยไม่สมมติยี่ห้อรถ, DBC หรือความหมายของ signal
+Open the web page via Wi-Fi to view every traffic ID, select the bitrate, check for dropped frames, and start/stop recording CSV to SD without assuming the car brand, DBC, or the meaning of the signal.
 
-หน้าเว็บถูกฝังใน firmware และใช้งานกับ ESP32 ในเครือข่ายท้องถิ่น นอกจากนี้ repository มี [Web Demo สำหรับ ESP32](https://poommyroboticcamera-netizen.github.io/DATA-logging-dashboard-CANBUS/) สำหรับทดลองตั้ง bitrate, เปิด/ปิด CAN, เริ่ม/หยุดบันทึกทุก ID และดาวน์โหลด CSV โดยไม่ต้องต่อฮาร์ดแวร์
+The web page is embedded in the firmware and is used with the ESP32 in the local network. In addition, the repository has [Web Demo for ESP32](https://poommyroboticcamera-netizen.github.io/DATA-logging-dashboard-CANBUS/) For experimenting with setting bitrate, turning on/off CAN, starting/stop recording every ID, and downloading CSV without connecting hardware.
 
 ## Project at a glance
 
@@ -69,18 +73,18 @@ flowchart LR
     CTRL --> DB
 ```
 
-CAN RX เป็น task ความสำคัญสูงสุดในกลุ่มงานของ analyzer และไม่รอการเขียน SD หรือการแสดงผล ส่วนงานวิเคราะห์และบันทึกข้อมูลใช้คิวจำกัดขนาด การพบ ID ไม่ได้หมายความว่าพบ ECU หนึ่งตัว
+CAN RX is the highest priority task in the analyzer's work group and does not wait for SD writing or display. The data analysis and logging section uses a limited queue size. Finding an ID does not mean that a single ECU has been found.
 
 ## Safety contract
 
-- CAN driver ไม่ทำงานตอน boot
-- เปิดจากหน้า CAN Analyzer หรือคำสั่ง Serial `CAN ON`
-- TWAI ถูกติดตั้งด้วย `TWAI_MODE_LISTEN_ONLY` เท่านั้น
-- transmit queue เป็นศูนย์ และ firmware ไม่มี `twai_transmit()`
-- ไม่มีคำสั่งส่ง frame, diagnostic request หรือเปลี่ยนเป็น active mode
-- รองรับ Classical CAN เท่านั้น ไม่รองรับ CAN FD
+- CAN driver doesn't work at boot
+- Open from the CAN Analyzer page or the Serial command. `CAN ON`
+- TWAI is also installed. `TWAI_MODE_LISTEN_ONLY` only
+- The transmit queue is zero and the firmware is none. `twai_transmit()`
+- There are no commands to send frames, diagnostic requests, or change to active mode.
+- Only Classical CAN is supported, CAN FD is not supported.
 
-Firmware passivity ไม่ทดแทน hardware safety: ตรวจรุ่น transceiver, logic voltage, standby/silent pin, TX/RX, ground, bitrate และพฤติกรรมช่วง boot/reset ก่อนต่อรถจริง
+Firmware passivity does not replace hardware safety: check transceiver model, logic voltage, standby/silent pin, TX/RX, ground, bitrate, and boot/reset behavior before actually connecting the vehicle.
 
 ## Hardware map
 
@@ -91,16 +95,16 @@ Firmware passivity ไม่ทดแทน hardware safety: ตรวจรุ�
 | SD CS | 5 | Card select |
 | SD SCK / MISO / MOSI | 18 / 19 / 23 | SPI storage |
 
-ตรวจ wiring ให้ตรงกับบอร์ดจริง ค่าเริ่มต้นอยู่ใน [Config.h](src/can/Config.h)
+Check the wiring to match the actual board. The default value is in [Config.h](src/can/Config.h)
 
 - CAN TX: GPIO25
 - CAN RX: GPIO26
-- Bitrate: 500 kbit/s (เลือก 50/100/125/250/500/1000 จากหน้าเว็บได้ขณะ CAN ปิด)
+- Bitrate: 500 kbit/s (select 50/100/125/250/500/1000 from web pages while CAN is off)
 - SD: CS5, SCK18, MISO19, MOSI23
 - Wi-Fi AP: `ESP32-CAN-Logger`
-- Password: `passive-can` — เปลี่ยนก่อนใช้งานจริง
+- Password: `passive-can` — Change before actual use.
 
-แก้ Wi-Fi ที่ `include/wifi_config.h` หากต้องการให้ ESP32 ต่อเครือข่าย 2.4 GHz เดิมด้วย หากปล่อย SSID ว่าง ให้เปิดหน้า `http://192.168.4.1/` ผ่าน AP ของ ESP32
+Fix Wi-Fi that `include/wifi_config.h` If you want the ESP32 to connect to the original 2.4 GHz network as well, if you leave the SSID blank, open the page. `http://192.168.4.1/` Through the AP of ESP32
 
 ## Getting started
 
@@ -113,7 +117,7 @@ cd DATA-logging-dashboard-CANBUS
 
 ### 2. Configure Wi-Fi
 
-ก่อน build ครั้งแรก คัดลอก `include/wifi_config.example.h` เป็น `include/wifi_config.h` แล้วตั้งค่า Wi-Fi ของคุณ ไฟล์ค่าจริงถูกยกเว้นจาก Git
+Before the first build, copy `include/wifi_config.example.h` is `include/wifi_config.h` and then set up your Wi-Fi. The actual value files are excluded from Git.
 
 Windows PowerShell:
 
@@ -135,25 +139,25 @@ pio run -e esp32dev -t upload
 pio device monitor -b 115200
 ```
 
-Build script จะรวม `dashboard/index.html`, CSS และ JavaScript เป็น gzip ใน firmware โดยอัตโนมัติ ไม่ต้อง upload filesystem เพิ่ม
+Build script will include `dashboard/index.html`, CSS and JavaScript are automatically gziped into the firmware, no need to upload additional filesystem.
 
 ### 4. Open the analyzer
 
-เปิด URL ที่ Serial แสดง หรือเชื่อมต่อ AP ของ ESP32 แล้วเปิด `http://192.168.4.1/` เลือก **CAN Analyzer → bitrate → เปิด CAN** และดูจำนวนเฟรมที่รับจริง หลังลง firmware ใหม่ให้ refresh หน้าเว็บด้วย Ctrl+F5
+Open the URL displayed by Serial or connect to the AP of ESP32 and open it. `http://192.168.4.1/` Select **CAN Analyzer → bitrate → turn on CAN** and see the actual number of frames received. After installing the new firmware, refresh the web page with Ctrl+F5.
 
-## ความสามารถหลัก
+## Core competencies
 
-- ค้นหา Standard/Extended ID, DLC, count, timing และความถี่โดยประมาณ
-- วิเคราะห์ byte/bit, variance, toggle, signal boundary candidates และ endianness
-- ตรวจ rolling counter candidates และ checksum/CRC field candidates แบบ bounded
-- Guided learning: baseline เทียบกับ experiment และรายงานเป็น candidate เท่านั้น
-- บันทึก raw CAN ลง SD แบบ asynchronous CSV
-- แสดง driver/queue/database/SD drops อย่างชัดเจน
-- ใช้ฐานข้อมูลและ history แบบ bounded เพื่อควบคุม RAM
+- Find Standard/Extended ID, DLC, count, timing and estimated frequency.
+- Analyze byte/bit, variance, toggle, signal boundary candidates and endianness.
+- Check rolling counter candidates and checksum/CRC bounded field candidates.
+- Guided learning: baseline vs. experiment and reported as candidate only
+- Save raw CAN to SD asynchronous CSV
+- Show driver/queue/database/SD drops clearly
+- Use bounded database and history to control RAM
 
 ## Data logging
 
-กด **LOG START** เมื่อเปิดรับ CAN แล้ว รอสถานะ recording และชื่อไฟล์ จากนั้นใช้ **LOG STOP** และรอปิดไฟล์ก่อนถอด SD
+Press **LOG START** when CAN is opened, wait for the recording status and file name, then use **LOG STOP** and wait to close the file before removing the SD.
 
 CSV:
 
@@ -161,9 +165,9 @@ CSV:
 timestamp_us,id,extended,dlc,d0,d1,d2,d3,d4,d5,d6,d7
 ```
 
-ไฟล์ชื่อ `/can_000001.csv`, `/can_000002.csv` ตามลำดับ พร้อม `.meta` สำหรับข้อมูล RTR และ loss counters ID เป็นเลขฐานสิบหก ส่วน timestamp เป็น microseconds และ data bytes เป็นเลขฐานสิบ ช่องที่ไม่มี payload จะว่าง
+file name `/can_000001.csv`, `/can_000002.csv` In order, ready `.meta` For RTR and loss counters data, IDs are hexadecimal, timestamps are microseconds, and data bytes are decimal. Fields that do not contain payloads are blank.
 
-ตัวอย่าง offline analysis ด้วย ID จำลองจาก bench:
+Example offline analysis with simulation ID from bench:
 
 ```sh
 python scripts/analyze_can_csv.py can_000001.csv --id 321 --extended 0 --dlc 8
@@ -171,31 +175,31 @@ python scripts/analyze_can_csv.py can_000001.csv --id 321 --extended 0 --dlc 8
 
 ## Repository structure
 
-- `src/main.cpp` — Wi-Fi AP, HTTP API และหน้า dashboard
-- `src/can/` — passive TWAI service และ analysis algorithms
-- `dashboard/` — หน้าเว็บ responsive และ CAN controls
-- `scripts/embed_dashboard.py` — ฝังหน้าเว็บลง firmware
-- `scripts/analyze_can_csv.py` — วิเคราะห์ checksum hypothesis แบบ offline
-- `tests/can/` — analysis, offline analyzer และ passive-contract tests
-- `examples/can_bench_generator/` — transmitter สำหรับ isolated bench เท่านั้น ห้ามต่อรถ
+- `src/main.cpp` — Wi-Fi AP, HTTP API and dashboard page
+- `src/can/` — passive TWAI service and analysis algorithms
+- `dashboard/` — Responsive web pages and CAN controls
+- `scripts/embed_dashboard.py` — Embed web pages into firmware
+- `scripts/analyze_can_csv.py` — Analyze checksum hypothesis offline
+- `tests/can/` — analysis, offline analyzer and passive-contract tests
+- `examples/can_bench_generator/` — transmitter for isolated bench only, do not connect to vehicle.
 
 Repository: https://github.com/poommyroboticcamera-netizen/DATA-logging-dashboard-CANBUS
 
-## Passive analyzer: ทุก ID
+## Passive analyzer: every ID
 
-การรับใช้ accept-all ไม่มี ID ของ encoder หรือผู้ผลิตรถฝังอยู่ในตัวกรองหรือ decoder
-ตารางแสดง raw bytes ของ Standard 11-bit / Extended 29-bit และ DATA / RTR แยกกัน
-ID เลขเดียวกันต่างชนิดจะเป็นคนละ record; RTR ไม่มี payload และ DLC 0 เป็นเฟรมที่ใช้ได้
-ยังไม่ตีความข้อมูลใดเป็น encoder, throttle หรือหน่วยทางกายภาพโดยอัตโนมัติ
+The accept-all implementation does not have the encoder or vehicle manufacturer's ID embedded in the filter or decoder.
+The table shows raw bytes of Standard 11-bit / Extended 29-bit and DATA / RTR separately.
+The same ID number of different types is a different record; RTR has no payload and DLC 0 is a valid frame.
+None of the data is automatically interpreted as an encoder, throttle, or physical unit.
 
-ฐานข้อมูลเริ่มต้นเก็บ 16 traffic records และตัวอย่างย้อนหลัง 32 เฟรมต่อ record
-เมื่อเต็ม สถิติของ record เดิมยังอัปเดต และแสดงจำนวนเฟรมที่ไม่มีช่องเก็บสถิติ
-SD logger รับเฟรมแยกจากฐานข้อมูล จึงยังบันทึก ID ที่เกินความจุได้ แต่คิว/SD อาจมี drops
-หน้าเว็บแสดง snapshot ล่าสุด ไม่ใช่ทุกเฟรมแบบสด; เก็บ raw CSV เพื่อดูเหตุการณ์สั้น ๆ
+The default database stores 16 traffic records and previews 32 historical frames per record.
+When full, the statistics of the original record are still updated. and shows the number of frames without a statistics box.
+The SD logger receives frames separately from the database, so IDs that exceed capacity can still be recorded, but the queue/SD may experience drops.
+The web page shows the most recent snapshot, not every live frame; Store raw CSV to view short events.
 
-## เริ่มรับโดยไม่ใช้เว็บ
+## Start earning without using the website
 
-Serial 115200 baud รองรับ LF, CRLF และ prefix `:` เช่น:
+Serial 115200 baud supports LF, CRLF and prefix. `:` such as:
 
 ```text
 CAN ON
@@ -210,47 +214,47 @@ LOG STOP
 CAN OFF
 ```
 
-รอ baseline จบก่อนเริ่ม experiment และรอไฟล์ปิดก่อนถอด SD
-`CAN ON` เข้า workspace และร้องขอเปิด listen-only driver; รอ `LISTENING` ก่อนทดลอง
-`STOP` พักการวิเคราะห์และการส่งเฟรมใหม่เข้า log แต่ยัง drain ตัวรับ; `START` เริ่มต่อ
-`CAN OFF` ปิด driver และขอปิด log; `RESET` ล้างสถิติและ capture แต่ไม่ล้าง loss counters
+Wait for the baseline to end before starting the experiment and wait for the file to close before removing the SD.
+`CAN ON` Enter the workspace and request to enable the listen-only driver; wait `LISTENING` Before testing
+`STOP` Pauses analysis and transmission of new frames into the log, but also drains the receiver; `START` resume
+`CAN OFF` Close the driver and close the log; `RESET` Clears stats and captures, but does not clear loss counters.
 
-หน้าเว็บแยก driver พร้อมรับออกจากการพบ traffic จริง และรายงาน:
+The page separates ready-to-drive drivers from actual traffic and reports:
 
-- จำนวนเฟรมตั้งแต่เปิด CAN ครั้งล่าสุด พร้อม STD/EXT/RTR (RTR รวมใน STD/EXT อยู่แล้ว)
-- อายุเฟรมล่าสุด; -1 หมายถึงยังไม่เคยรับในรอบเปิดนี้
-- REC/TEC, driver start error, bus errors และเฟรมที่ DLC ไม่ตรง Classical CAN
-- การพักวิเคราะห์ และฐานข้อมูลเต็ม
+- Number of frames since CAN was last turned on, with STD/EXT/RTR (RTR is already included in STD/EXT)
+- Latest frame age; -1 means you haven't received it in this opening round yet.
+- REC/TEC, driver start error, bus errors and frames that DLC does not match Classical CAN
+- analytical break and full database
 
-จำนวนรับจริงมาจากการ dequeue ของ TWAI รวมถึงขณะพักวิเคราะห์ จึงอาจต่างจากจำนวนวิเคราะห์
-errors ของ driver poll ทุก 100 ms; ช่วงก่อนปิด driver อาจมี error ที่ยังไม่ได้ poll
-การไม่มี traffic ไม่พิสูจน์ว่าสายเสียหรือ bitrate ผิด เพราะตัวส่งอาจยังไม่ส่งหรือ bus หลับ
+The actual received amount comes from the dequeue of TWAI and during the analysis break. Therefore, it may be different from the analyzed number.
+errors of driver poll every 100 ms; Before shutting down the driver, there may be errors that haven't been polled yet.
+The absence of traffic does not prove that the cable is broken or that the bitrate is wrong, because the transmitter may not be sending yet or the bus is asleep.
 
-## ทดสอบสองบอร์ดของคุณ
+## Test your two boards.
 
-1. ตัวรับใช้ firmware จาก PlatformIO โปรเจกต์นี้: TX25, RX26, SN65HVD230, 500 kbit/s
-2. ตัวส่งใช้ `examples/can_bench_generator/can_bench_generator.ino`: TX25, RX26, 500 kbit/s
-3. ในวงจร bench ที่แยกจากรถ ต่อ GPIO27 ของตัวส่งลง GND และส่ง `ENABLE BENCH`
-4. เปิด CAN บนตัวรับ ควรพบ synthetic IDs 0x321 (ทั้ง STD และ EXT), 0x322, 0x345 และ RTR 0x456
-5. กด `LOG START` ที่ตัวรับ รออย่างน้อย 10 วินาที แล้วกด `LOG STOP` และรอจนสถานะเป็น `STOPPED`
-6. นำ SD มาเปิดบนคอมพิวเตอร์ แล้วตรวจไฟล์ที่ได้ด้วย:
+1. Firmware from PlatformIO for this project: TX25, RX26, SN65HVD230, 500 kbit/s.
+2. The transmitter uses `examples/can_bench_generator/can_bench_generator.ino`: TX25, RX26, 500 kbit/s
+3. In a bench circuit that is separate from the car, connect GPIO27 of the transmitter to GND and send. `ENABLE BENCH`
+4. Open CAN on the receiver. It should find synthetic IDs 0x321 (both STD and EXT), 0x322, 0x345 and RTR 0x456.
+5. press `LOG START` On the receiver, wait at least 10 seconds, then press `LOG STOP` and wait until the status is `STOPPED`
+6. Open the SD card on the computer. Then check the files with:
 
 ```sh
 python scripts/verify_bench_csv.py can_000001.csv
 ```
 
-ผล `PASS` ยืนยันว่า CSV ทุกแถวมีโครงสร้างถูกต้อง, timestamp ไม่ย้อนกลับ และพบ stream จำลอง 0x321 ทั้ง STD/EXT, 0x322, 0x345 และ RTR 0x456 อย่างน้อยหนึ่งเฟรม หากขึ้น `FAIL` ห้ามถือว่าการทดสอบ logger ผ่าน
+result `PASS` Verify that all rows of the CSV are structured correctly, timestamps are not reversed, and that dummy stream 0x321 is found for both STD/EXT, 0x322, 0x345, and at least one frame of RTR 0x456 if shown. `FAIL` Do not assume the logger test has passed.
 
-ตัวส่ง bench ใช้ No-ACK เพราะตัวรับ passive ไม่ส่ง ACK
-ไฟล์ encoder `Documents/Arduino/can/can.ino` ของคุณใช้ Normal mode และคาดหวัง ACK
-จึงไม่ใช่ตัวส่งคู่ทดสอบที่เทียบเท่ากันเมื่อมีเพียงสองโหนดและตัวรับเป็น passive
-เราไม่ได้เปลี่ยนไฟล์ encoder หรือไฟล์ receiver แบบ Normal mode ใน Arduino
+Bench transmitters use No-ACK because passive receivers do not send ACKs.
+encoder file `Documents/Arduino/can/can.ino` Yours uses Normal mode and expects ACK.
+It is therefore not an equivalent test pair transmitter when there are only two nodes and the receiver is passive.
+We did not change the encoder file or receiver file in Normal mode in Arduino.
 
-ขา RS ผ่าน 10 kΩ ลง GND ของ SN65HVD230 เป็น slope control; ตัวรับยังทำงาน
-Software listen-only ไม่ป้องกันช่วงก่อน driver เริ่มทำงานหรือความผิดปกติทางไฟฟ้า
-ทดสอบ hardware บน bench ก่อนนำไปต่อรถจริง
+RS pin through 10 kΩ down GND of SN65HVD230 is slope control; The receiver still works.
+Software listen-only does not protect against driver startup or electrical malfunctions.
+Test the hardware on the bench before putting it into the real car.
 
-## ตรวจสอบซอฟต์แวร์
+## Check software
 
 ```text
 node dashboard/can.test.cjs
@@ -260,17 +264,17 @@ python tests/can/test_offline_analyzer.py
 pio run -e esp32dev
 ```
 
-Host C++ tests: compile `src/can/Analysis.cpp` คู่กับ `tests/can/test_analysis.cpp`
-และ compile `tests/can/test_console.cpp` แยกอีก executable ด้วย C++17
-การ build และ host tests ไม่ยืนยันการรับจาก transceiver จริงหรือ sustained-load throughput
+Host C++ tests: compile `src/can/Analysis.cpp` paired with `tests/can/test_analysis.cpp`
+and compile `tests/can/test_console.cpp` Separate another executable with C++17
+The build and host tests do not verify actual reception from the transceiver or sustained-load throughput.
 
-ดูผล build และขอบเขตการทดสอบใน [VALIDATION.md](VALIDATION.md)
+View build results and testing scope in [VALIDATION.md](VALIDATION.md)
 
 ## Project status
 
-Firmware และ host tests ผ่านการตรวจตาม validation record ส่วนการรับจาก transceiver จริง, SD stalls, runtime heap และความเสถียรระยะยาวยังต้องทดสอบบนบอร์ด หน้าเว็บตั้งใจใช้ในเครือข่ายที่เชื่อถือได้และยังไม่มีระบบ authentication
+Firmware and host tests pass the validation record, while actual transceiver reception, SD stalls, runtime heap and long-term stability still need to be tested on the board. The web page is intended to be used on trusted, unsystematic networks. authentication
 
-รูปแบบการนำเสนอและแนวทาง dashboard อ้างอิงจาก [ESP32 Data Logging Dashboard](https://github.com/poommyroboticcamera-netizen/DATA-Logging-Dashboard-esp32) โดยเนื้อหาใน repository นี้อธิบาย CAN analyzer ที่มีอยู่จริง
+Presentation format and dashboard guidelines based on [ESP32 Data Logging Dashboard](https://github.com/poommyroboticcamera-netizen/DATA-Logging-Dashboard-esp32) The contents of this repository describe actual CAN analyzers.
 
 ---
 

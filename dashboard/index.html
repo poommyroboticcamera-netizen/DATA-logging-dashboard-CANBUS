@@ -1,6 +1,6 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ESP32 Passive CAN Dashboard</title><style>/*__STYLE__*/</style></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ESP32 Passive CAN Dashboard</title><style>/*__STYLE__*/</style></head><body>
 <aside class="sidebar"><h1>CAN LAB</h1><nav><a href="#overview">Overview</a><a id="nav-can" href="#can">CAN Analyzer</a></nav><p>ESP32 · TWAI<br>Listen-only</p></aside><main>
-<header><div><span class="eyebrow">AUTOMOTIVE DATA LOGGER</span><h2>ESP32 Passive CAN Dashboard</h2></div><div class="mode-tabs"><button data-mode="dashboard" class="selected">Overview</button><button data-mode="can">CAN Analyzer</button></div></header>
+<header><div><span class="eyebrow">AUTOMOTIVE DATA LOGGER</span><h2>ESP32 Passive CAN Dashboard</h2></div><div class="mode-tabs"><button data-mode="dashboard" class="selected">Overview</button><button data-mode="can">CAN Analyzer</button></div><button id="language-switch" class="language-switch" type="button" aria-label="Switch language">ไทย</button></header>
 <p id="mode-status" class="status">CAN controller is off. Enter CAN Analyzer to configure it.</p>
 <section class="workspace" id="overview"><article class="hero"><span>PASSIVE BY DESIGN</span><h2>Discover traffic before assigning meaning.</h2><p>TWAI starts disabled. When explicitly enabled, it is installed only in LISTEN_ONLY mode, with no transmit queue or transmit command.</p><div class="safety"><b>ก่อนต่อเข้ารถ</b><br>ตรวจแรงดัน transceiver, ขา TX/RX, bitrate และ hardware silent behavior ให้ตรงกับวงจรจริง รองรับ Classical CAN เท่านั้น ไม่รองรับ CAN FD</div></article></section>
 <section id="mode-can" hidden><div class="can-mode-banner"><strong>CAN MODE · LISTEN ONLY</strong><span>ไม่มีการส่ง arbitrary frame, ACK หรือ diagnostic request</span></div>
@@ -11,4 +11,4 @@
 <article class="panel"><div class="section-title"><h3>บันทึก Raw CAN ทุก ID ลง SD</h3><span id="can-log-state" class="pill">Stopped</span></div><div class="toolbar"><button id="can-log-start">LOG START</button><button id="can-log-stop">LOG STOP</button><span id="can-file">ยังไม่มีไฟล์</span></div><p id="can-rows"></p><p>CSV: timestamp_us,id,extended,dlc,d0,d1,d2,d3,d4,d5,d6,d7 · ไม่ลด sample และไม่จำกัดเฉพาะ ID ที่อยู่ในฐานวิเคราะห์</p></article>
 <article class="panel"><div class="section-title"><h3>Observed traffic</h3><button id="can-reset">RESET</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Type</th><th>DLC</th><th>Count</th><th>Hz</th><th>Latest data</th><th>Frame</th></tr></thead><tbody id="can-ids"></tbody></table></div><p id="can-empty">ยังไม่พบ CAN frame</p></article>
 </section>
-</main><script>/*__CAN__*/</script></body></html>
+</main><script>/*__CAN__*/</script><script>/*__LANGUAGE__*/</script></body></html>
